@@ -1,8 +1,10 @@
 const express = require("express");
 const authRouter = require("./authRouter");
 const mongoose = require("mongoose");
-
+var cors = require("cors");
 const PORT = process.env.PORT || 5000;
+
+app.use(cors());
 
 const app = express();
 

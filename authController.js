@@ -20,7 +20,6 @@ class authController {
         return res.status(422).json({ message: "Validation error", errors });
       }
       const {
-        username,
         password,
         firstName,
         lastName,
@@ -31,16 +30,15 @@ class authController {
       } = req.body;
 
       const candidate = await User.findOne({
-        username: new RegExp("^" + username + "$", "i"),
+        email: new RegExp("^" + email + "$", "i"),
       });
       if (candidate) {
         return res
           .status(409)
-          .json({ message: "User with this username has already exist" });
+          .json({ message: "User with this email has already exist" });
       }
       const hashPassword = bcrypt.hashSync(password, 7);
       const user = new User({
-        username,
         password: hashPassword,
         firstName,
         lastName,
@@ -57,12 +55,14 @@ class authController {
   }
   async login(req, res) {
     try {
-      const { username, password } = req.body;
+      const { email, password } = req.body;
       const user = await User.findOne({
-        username: new RegExp("^" + username + "$", "i"),
+        email: new RegExp("^" + email + "$", "i"),
       });
       if (!user) {
-        return res.status(400).json({ message: `User ${username} not found` });
+        return res
+          .status(400)
+          .json({ message: `User with email ${email} not found` });
       }
       const validPassword = bcrypt.compareSync(password, user.password);
       if (!validPassword) {

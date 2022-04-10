@@ -12,8 +12,9 @@ module.exports = function (req, res, next) {
     if (!token) {
       return res.status(483).json({ message: "User not authorised" });
     }
-    const status = jwt.verify(token, secret);
-    if (status == "blocked") {
+    const { status } = jwt.verify(token, secret);
+    console.log(status);
+    if (status == "Blocked") {
       return res.status(403).json({ message: "You are blocked" });
     }
     next();
