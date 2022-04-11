@@ -7,7 +7,7 @@ const User = new Schema({
   email: { type: String, unique: true, trim: true, required: true },
   registration: { type: Date, default: Date.now },
   lastVisit: { type: Date, default: Date.now },
-  status: { type: String, default: "active" },
+  status: { type: String, default: "Active" },
 });
 
 module.exports = model("User", User);

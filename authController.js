@@ -61,12 +61,12 @@ class authController {
       });
       if (!user) {
         return res
-          .status(400)
+          .status(401)
           .json({ message: `User with email ${email} not found` });
       }
       const validPassword = bcrypt.compareSync(password, user.password);
       if (!validPassword) {
-        return res.status(400).json({ message: "Wrong password" });
+        return res.status(402).json({ message: "Wrong password" });
       }
       const token = generateAccesToken(user._id, user.status);
       return res.json({ token });
@@ -85,9 +85,14 @@ class authController {
   }
   async deleteUsers(req, res) {
     try {
-      const { ids } = req.body;
-      console.log(ids);
-      await User.deleteMany({ _id: { $in: ids } });
+      const { body } = req.body;
+      const token = req.headers.authorization.split(" ")[1];
+      const { id } = jwt.verify(token, secret);
+      const _id = id;
+      await User.deleteMany({ _id: { $in: body } });
+      if (body.includes(_id)) {
+        return res.status(405).json({ message: "You are blocked" });
+      }
       return res.json({ message: "Users deleted" });
     } catch (e) {
       console.log(e);
@@ -95,11 +100,17 @@ class authController {
   }
   async blockUsers(req, res) {
     try {
-      const { ids } = req.body;
+      const { body } = req.body;
+      const token = req.body.headers.Authorization.split(" ")[1];
+      const { id } = jwt.verify(token, secret);
+      const _id = id;
       await User.updateMany(
-        { _id: { $in: ids } },
+        { _id: { $in: body } },
         { $set: { status: "Blocked" } }
       );
+      if (body.includes(_id)) {
+        return res.status(405).json({ message: "You are blocked" });
+      }
       return res.json({ message: "Users blocked" });
     } catch (e) {
       console.log(e);
@@ -107,9 +118,9 @@ class authController {
   }
   async unblockUsers(req, res) {
     try {
-      const { ids } = req.body;
+      const { body } = req.body;
       await User.updateMany(
-        { _id: { $in: ids } },
+        { _id: { $in: body } },
         { $set: { status: "Active" } }
       );
       return res.json({ message: "Users unblocked" });
