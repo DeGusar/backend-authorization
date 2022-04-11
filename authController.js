@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 const { secret } = require("./config");
+const { json } = require("express/lib/response");
 
 const generateAccesToken = (id, status) => {
   const payload = {
@@ -77,6 +78,15 @@ class authController {
 
   async getUsers(req, res) {
     try {
+      const token = req.headers.authorization.split(" ")[1];
+      const { id } = jwt.verify(token, secret);
+      const _id = id;
+      const user = await User.findOne({
+        _id: _id,
+      });
+      if (user === null || user.status === "Blocked") {
+        return res.status(411).json({ message: "Blocked" });
+      }
       const users = await User.find();
       res.json(users);
     } catch (e) {
