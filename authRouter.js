@@ -17,5 +17,6 @@ router.get("/users", authMiddleware, controller.getUsers);
 router.delete("/delete", controller.deleteUsers);
 router.patch("/block", controller.blockUsers);
 router.patch("/unblock", controller.unblockUsers);
+router.post("/create", controller.createUsers);
 
 module.exports = router;

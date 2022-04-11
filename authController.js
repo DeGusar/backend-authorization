@@ -128,6 +128,16 @@ class authController {
       console.log(e);
     }
   }
+  async createUsers(req, res) {
+    const usersData = Object.values(req.body);
+    usersData.forEach((user) => {
+      const newUser = new User({
+        ...user,
+      });
+      newUser.save();
+    });
+    return res.json({ message: "Users created" });
+  }
 }
 
 module.exports = new authController();
